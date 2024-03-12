@@ -1,0 +1,27 @@
+[project]
+name = "nonebot-plugin-ghtiles"
+version = "0.1.0"
+description = "A nonebot2 plugin for show GitHub contributions"
+readme = "README.md"
+requires-python = ">=3.9, <4.0"
+dependencies = ["nonebot2>=2.0.0","nonebot-plugin-alconna>=0.38.1"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+homepage = "https://gtihub.com/Lipraty/nonebot-plugin-ghtiles"
+
+[tool.nonebot]
+adapters = [
+    { name = "Satori", module_name = "nonebot.adapters.satori" }
+]
+plugins = ["nonebot_plugin_alconna", "nonebot_plugin_apscheduler", "nonebot_plugin_localstore"]
+plugin_dirs = ["nonebot_plugin_ghtiles"]
+builtin_plugins = ["echo"]
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
