@@ -15,7 +15,9 @@ from .config import Config
 require("nonebot_plugin_alconna")
 require("nonebot_plugin_apscheduler")
 require("nonebot_plugin_localstore")
+require("nonebot_plugin_session")
 
+import nonebot_plugin_localstore as store  # noqa: E402
 from nonebot_plugin_alconna import (  # noqa: E402
     At,
     Command,
@@ -24,7 +26,7 @@ from nonebot_plugin_alconna import (  # noqa: E402
     Target,
 )
 from nonebot_plugin_apscheduler import scheduler  # noqa: E402
-import nonebot_plugin_localstore as store  # noqa: E402
+from nonebot_plugin_session import EventSession, SessionIdType  # noqa: E402
 
 __plugin_meta__ = PluginMetadata(
     name="ghtiles",
@@ -78,7 +80,7 @@ async def schedule():
             username, await get_homepage_html(username, config.ght_proxy)
         )
         users[user_id]["contributions"] = contributions
-        time.sleep(2)  # avoid rate limit
+        time.sleep(1)  # avoid rate limit
     bot = get_bot()
     for group_id, user_list in _data["on_reminder"].items():
         if not user_list:  # private, skip
@@ -117,22 +119,20 @@ _data = AutoSave(store.get_data_file("ghtiles", "data.json"))
 # }
 
 tile_cmd = Command("tile").alias("瓷砖").build()
-
-
 @tile_cmd.handle()
-async def tile_cmd_handle(event: Event):
-    user_id = event.get_user_id()
+async def tile_cmd_handle(event: Event, session: EventSession):
+    user_id = session.id1
     username = _data[user_id]["username"]
     contributions = await get_today_contributions(
         username, await get_homepage_html(username, config.ght_proxy)
     )
-    await tile_cmd.finish(tile_msg(username, contributions))
+    return await tile_msg(username, contributions).send(event)
+
 
 tile_bind_cmd = Command("tile.bind <username:str>", "绑定 GitHub 用户名").alias("绑定").build()
-
 @tile_bind_cmd.handle()
-async def tile_bind_cmd_handle(event: Event, username: str):
-    user_id = event.get_user_id()
+async def tile_bind_cmd_handle(event: Event, username: str, session: EventSession):
+    user_id = session.id1
     # check
     if user_id in _data["users"]:
         return await UniMessage("你已经绑定过了").send(event)
@@ -141,3 +141,16 @@ async def tile_bind_cmd_handle(event: Event, username: str):
         return await UniMessage("这个用户不存在或者没有公开活动").send(event)
     _data["users"][user_id] = {"username": username}
     return await UniMessage(f"绑定成功，你的 GitHub 用户名是 {username}").send(event)
+
+
+tile_remine_cmd = Command("tile.remind").alias("创建提醒").build()
+@tile_remine_cmd.handle()
+async def tile_remine_cmd_handle(event: Event, session: EventSession):
+    user_id = session.id1
+    group_id = session.id2
+    if group_id not in _data["on_reminder"].keys():
+        _data["on_reminder"][group_id] = []
+    if user_id in _data["on_reminder"][group_id]:
+        return await UniMessage("你已经创建过提醒了").send(event)
+    _data["on_reminder"][group_id].append(user_id)
+    return await UniMessage("创建提醒成功").send(event)

@@ -18,7 +18,7 @@ homepage = "https://gtihub.com/Lipraty/nonebot-plugin-ghtiles"
 adapters = [
     { name = "Satori", module_name = "nonebot.adapters.satori" }
 ]
-plugins = ["nonebot_plugin_alconna", "nonebot_plugin_apscheduler", "nonebot_plugin_localstore"]
+plugins = ["nonebot_plugin_alconna", "nonebot_plugin_apscheduler", "nonebot_plugin_localstore", "nonebot_plugin_session"]
 plugin_dirs = ["nonebot_plugin_ghtiles"]
 builtin_plugins = ["echo"]
 
