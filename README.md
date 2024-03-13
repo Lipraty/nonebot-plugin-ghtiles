@@ -25,7 +25,7 @@ _✨ 看看你的 GitHub 瓷砖 for NoneBot2 ✨_
   <img src="https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/lgc-NB2Dev/readme/main/template/pyd-v1-or-v2.json" alt="Pydantic Version 1 Or 2" >
 </a>
 <a href="./LICENSE">
-  <img src="https://img.shields.io/github/license/lgc2333/nonebot-plugin-ghtiles.svg" alt="license">
+  <img src="https://img.shields.io/github/license/lipraty/nonebot-plugin-ghtiles.svg" alt="license">
 </a>
 <a href="https://pypi.python.org/pypi/nonebot-plugin-ghtiles">
   <img src="https://img.shields.io/pypi/v/nonebot-plugin-ghtiles.svg" alt="pypi">
@@ -116,15 +116,15 @@ GitHub 地址，如果需要解决国内访问 GitHub 的问题，可以替换�
 
 ### 指令
 
-#### `ghtile`
+#### `tile`
 
 查看你的 GitHub 瓷砖
 
-#### `ghtile.bind <username>`
+#### `tile.bind <username>`
 
 绑定你的 GitHub 用户名
 
-#### `ghtile.remine`
+#### `tile.remine`
 
 创建一个提醒，当这一天即将过去而你还没有提交时，会提醒你
 
@@ -133,7 +133,3 @@ GitHub 地址，如果需要解决国内访问 GitHub 的问题，可以替换�
 ### [nonebot/plugin-alconna](https://github.com/nonebot/plugin-alconna)
 
 - 强大的命令解析库，和多平台适配方案
-
-<!-- ### [noneplugin/nonebot-plugin-userinfo](https://github.com/noneplugin/nonebot-plugin-userinfo)
-
-- 多平台用户信息获取方案 -->
