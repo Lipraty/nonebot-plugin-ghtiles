@@ -1,4 +1,4 @@
-import time
+import asyncio
 from nonebot import get_bot, get_plugin_config, require, get_driver, logger
 from nonebot.plugin import PluginMetadata
 from nonebot.adapters import Event
@@ -106,7 +106,7 @@ async def schedule():
             username, await get_homepage_html(username, config.ght_proxy)
         )
         users[user_id]["contributions"] = contributions
-        time.sleep(1)  # avoid rate limit
+        await asyncio.sleep(1)  # avoid rate limit
     logger.debug(f"users updated of contributions: {users}")
     bot = get_bot()
     for group_id, user_list in _data["on_reminder"].items():
