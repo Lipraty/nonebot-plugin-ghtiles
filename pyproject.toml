@@ -12,7 +12,7 @@ classifiers = [
 ]
 
 [project.urls]
-homepage = "https://gtihub.com/Lipraty/nonebot-plugin-ghtiles"
+homepage = "https://github.com/Lipraty/nonebot-plugin-ghtiles"
 
 [tool.nonebot]
 adapters = [
