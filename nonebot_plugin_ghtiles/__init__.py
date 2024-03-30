@@ -1,4 +1,6 @@
 import asyncio
+
+import httpx
 from nonebot import get_bot, get_plugin_config, require, get_driver, logger
 from nonebot.plugin import PluginMetadata
 from nonebot.adapters import Event
@@ -149,14 +151,15 @@ async def tile_cmd_handle(event: Event, session: EventSession):
     print(user_id)
     print(session)
     logger.debug(f"triggered tile_cmd_handle, user_id: {user_id}")
-    username = _data["users"][user_id]["username"]
-    logger.debug(f"triggered tile_cmd_handle, user_id: {user_id}, username: {username}")
-    if not username:
-        await UniMessage(
+    user_id = _data["users"].get(user_id)
+    if not user_id:
+        await tile_cmd.finish(
             "好像没有绑定过 GitHub? 输入 `/tile.bind <github username>` 来绑定"
-        ).send(event)
+        )
+    username = user_id["username"]
+    logger.debug(f"triggered tile_cmd_handle, user_id: {user_id}, username: {username}")
     contributions = await get_today_contributions(
-        username, await get_homepage_html(username, config.ght_proxy)
+        await get_homepage_html(username, config.ght_proxy)
     )
     logger.debug(f"get contributions: {contributions} of {username}")
     await tile_msg(username, contributions).send(event)
@@ -178,11 +181,15 @@ async def tile_bind_cmd_handle(event: Event, username: str, session: EventSessio
         logger.debug(f"binded user_id: {user_id}")
         return await UniMessage("你已经绑定过了").send(event)
     # check username
-    if check_contributions(
-        username, await get_homepage_html(username, config.ght_proxy)
-    ):
+    try:
+        if not await check_contributions(
+            gh_html=await get_homepage_html(username, config.ght_proxy)
+        ):
+            logger.debug(f"username: {username} not exists")
+            return await UniMessage("这个用户没有公开活动").send(event)
+    except httpx.HTTPStatusError:
         logger.debug(f"username: {username} not exists")
-        return await UniMessage("这个用户不存在或者没有公开活动").send(event)
+        return await UniMessage("这个用户不存在").send(event)
     _data["users"][user_id] = {"username": username}
     logger.debug(f"binded username: {username} to user_id: {user_id}")
     return await UniMessage(f"绑定成功，你的 GitHub 用户名是 {username}").send(event)

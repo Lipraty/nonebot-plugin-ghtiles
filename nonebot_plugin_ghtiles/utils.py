@@ -17,11 +17,11 @@ async def get_homepage_html(gh_name: str, proxy: str = "https://github.com") -> 
         return response.text
 
 
-async def check_contributions(gh_name: str, gh_html: str) -> bool:
+async def check_contributions(gh_html: str) -> bool:
     return re.compile(r"\'s activity is private\<\/h2\>").search(gh_html) is None
 
 
-async def get_today_contributions(gh_name: str, gh_html: str):
+async def get_today_contributions(gh_html: str) -> int:
     match = re.compile(
         r'data-date="' + get_today() + r".*?(\d+|No) contributions"
     ).search(gh_html)
