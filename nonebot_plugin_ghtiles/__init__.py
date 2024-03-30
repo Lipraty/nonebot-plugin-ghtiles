@@ -185,11 +185,12 @@ async def tile_bind_cmd_handle(event: Event, username: str, session: EventSessio
         if not await check_contributions(
             gh_html=await get_homepage_html(username, config.ght_proxy)
         ):
-            logger.debug(f"username: {username} not exists")
+            logger.debug(f"username: {username} has no public activity")
             return await UniMessage("这个用户没有公开活动").send(event)
-    except httpx.HTTPStatusError:
-        logger.debug(f"username: {username} not exists")
-        return await UniMessage("这个用户不存在").send(event)
+    except httpx.HTTPStatusError as e:
+        if e.response.status_code == 404:
+            logger.debug(f"username: {username} not exists")
+            return await UniMessage("这个用户不存在").send(event)
     _data["users"][user_id] = {"username": username}
     logger.debug(f"binded username: {username} to user_id: {user_id}")
     return await UniMessage(f"绑定成功，你的 GitHub 用户名是 {username}").send(event)
