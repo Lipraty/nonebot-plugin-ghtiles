@@ -36,36 +36,28 @@ async def get_today_contributions(gh_html: str) -> int:
 
 
 class AutoSave:
-    def __init__(self, fileProxy: Path, proxy: dict = {}, initial_data: dict = {}):
+    def __init__(self, fileProxy: Path, proxy: dict = None, initial_data: dict = None):
         self._fileProxy = fileProxy
-        if not proxy:
+        if proxy is None:
             if fileProxy.exists():
                 load_by_file = json.loads(fileProxy.read_text())
-                if load_by_file == {}:
-                    load_by_file = initial_data
-                self._proxy = load_by_file
-                self._save()
+                self._proxy = load_by_file if load_by_file else initial_data or {}
             else:
-                self._proxy = proxy = initial_data
-                self._save()
+                self._proxy = initial_data or {}
         else:
             self._proxy = proxy
+        self._save()
 
     def _save(self):
         self._fileProxy.write_text(json.dumps(self._proxy, ensure_ascii=False))
 
     def __getitem__(self, name):
-        print(name)
-        print(self._proxy)
         return self._proxy[name]
 
-    def __setitem__(self, __name: str, __value):
-        if __name == "_proxy":
-            super().__setattr__("_proxy", __name)
-        else:
-            self._proxy[__name] = __value
-            self._save()
+    def __setitem__(self, name: str, value):
+        self._proxy[name] = value
+        self._save()
 
-    def __delitem__(self, __name: str):
-        del self._proxy[__name]
+    def __delitem__(self, name: str):
+        del self._proxy[name]
         self._save()

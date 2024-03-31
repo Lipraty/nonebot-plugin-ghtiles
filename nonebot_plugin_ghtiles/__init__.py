@@ -2,9 +2,10 @@ import asyncio
 
 import httpx
 from nonebot import get_bot, get_plugin_config, require, get_driver, logger
-from nonebot.plugin import PluginMetadata
 from nonebot.adapters import Event
+from nonebot.plugin import PluginMetadata
 
+from .config import Config
 from .utils import (
     AutoSave,
     get_homepage_html,
@@ -12,7 +13,6 @@ from .utils import (
     get_today_contributions,
     check_contributions,
 )
-from .config import Config
 
 require("nonebot_plugin_alconna")
 require("nonebot_plugin_apscheduler")
@@ -105,7 +105,7 @@ async def schedule():
     for user_id, user_data in users.items():
         username = user_data["username"]
         contributions = await get_today_contributions(
-            username, await get_homepage_html(username, config.ght_proxy)
+            await get_homepage_html(username, config.ght_proxy)
         )
         users[user_id]["contributions"] = contributions
         await asyncio.sleep(1)  # avoid rate limit
@@ -191,7 +191,14 @@ async def tile_bind_cmd_handle(event: Event, username: str, session: EventSessio
         if e.response.status_code == 404:
             logger.debug(f"username: {username} not exists")
             return await UniMessage("这个用户不存在").send(event)
-    _data["users"][user_id] = {"username": username}
+    users_copy = _data["users"].copy()
+
+    user_info = users_copy.get(user_id, {})
+
+    user_info["username"] = username
+    users_copy[user_id] = user_info
+
+    _data["users"] = users_copy
     logger.debug(f"binded username: {username} to user_id: {user_id}")
     return await UniMessage(f"绑定成功，你的 GitHub 用户名是 {username}").send(event)
 
@@ -208,10 +215,16 @@ tile_remine_cmd = (
 async def tile_remine_cmd_handle(event: Event, session: EventSession):
     user_id = session.id1
     group_id = session.id2
-    if group_id not in _data["on_reminder"].keys():
-        _data["on_reminder"][group_id] = []
-    if user_id in _data["on_reminder"][group_id]:
+
+    on_reminder_updated = _data["on_reminder"].copy()
+
+    if group_id not in on_reminder_updated:
+        on_reminder_updated[group_id] = []
+
+    if user_id in on_reminder_updated[group_id]:
         return await UniMessage("你已经创建过提醒了").send(event)
-    _data["on_reminder"][group_id].append(user_id)
+
+    on_reminder_updated[group_id].append(user_id)
+    _data["on_reminder"] = on_reminder_updated
     logger.debug(f"create reminder for user_id: {user_id} in group_id: {group_id}")
     return await UniMessage("创建提醒成功").send(event)
