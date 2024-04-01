@@ -143,4 +143,8 @@ dmypy.json
 
 .pdm-python
 
+#ides
+.idea/
+.vscode/
+
 # End of https://www.toptal.com/developers/gitignore/api/python
