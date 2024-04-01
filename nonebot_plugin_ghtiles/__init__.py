@@ -45,14 +45,14 @@ __plugin_meta__ = PluginMetadata(
 
 config = get_plugin_config(Config)
 
-
 driver = get_driver()
-
 
 _data = AutoSave(
     store.get_data_file("ghtiles", "data.json"),
     initial_data={"on_reminder": {}, "users": {}},
 )
+
+
 # data structure
 # {
 #     "on_reminder": {
@@ -123,9 +123,11 @@ async def schedule():
         zero_in_group = [
             user_id for user_id in user_list if users[user_id]["contributions"] == 0
         ]
-        await UniMessage(winner_msg(max_in_group_username, max_in_group)).send(
-            Target(group_id, platform=bot.adapter.get_name())
-        )
+        await UniMessage(
+            winner_msg(
+                _data["users"].get(max_in_group_username)["username"], max_in_group
+            )
+        ).send(Target(group_id, platform=bot.adapter.get_name()))
         logger.debug(f"send winner_msg to {group_id}, winner: {max_in_group_username}")
         if zero_in_group:
             await UniMessage(no_contributions_msg(zero_in_group)).send(
@@ -146,10 +148,7 @@ tile_cmd = (
 
 @tile_cmd.handle()
 async def tile_cmd_handle(event: Event, session: EventSession):
-    logger.debug(_data)
     user_id = session.id1
-    print(user_id)
-    print(session)
     logger.debug(f"triggered tile_cmd_handle, user_id: {user_id}")
     user_id = _data["users"].get(user_id)
     if not user_id:
