@@ -10,7 +10,10 @@ def get_today() -> str:
 
 
 async def get_homepage_html(gh_name: str, proxy: str = "https://github.com") -> str:
-    url = f"{proxy}/{gh_name}"
+    url = f"{proxy}/{gh_name}?action=show&controller=profiles&tab=contributions&user_id={gh_name}"
+    headers = {
+        "X-Requested-With": "XMLHttpRequest"
+    }
     async with httpx.AsyncClient() as client:
         response = await client.get(url)
         response.raise_for_status()
