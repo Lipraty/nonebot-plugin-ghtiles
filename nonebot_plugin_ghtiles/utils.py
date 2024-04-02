@@ -26,7 +26,7 @@ async def check_contributions(gh_html: str) -> bool:
 
 async def get_today_contributions(gh_html: str) -> int:
     match = re.compile(
-        r'data-date="' + get_today() + r".*?(\d+|No) contributions"
+        r'data-date="' + get_today() + r"[\d\D]*?(\d+|No) contributions"
     ).search(gh_html)
     if match:
         contributions = match.group(1)
