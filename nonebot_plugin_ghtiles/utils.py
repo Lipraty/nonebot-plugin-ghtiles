@@ -15,7 +15,7 @@ async def get_homepage_html(gh_name: str, proxy: str = "https://github.com") -> 
         "X-Requested-With": "XMLHttpRequest"
     }
     async with httpx.AsyncClient() as client:
-        response = await client.get(url)
+        response = await client.get(url, headers=headers)
         response.raise_for_status()
         return response.text
 
