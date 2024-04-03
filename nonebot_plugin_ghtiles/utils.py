@@ -3,16 +3,20 @@ import re
 import httpx
 from datetime import datetime
 from pathlib import Path
+from bs4 import BeautifulSoup
 
 
 def get_today() -> str:
     return datetime.now().strftime("%Y-%m-%d")
 
-
+# only contributions html elements
 async def get_homepage_html(gh_name: str, proxy: str = "https://github.com") -> str:
-    url = f"{proxy}/{gh_name}"
+    url = f"{proxy}/{gh_name}?action=show&controller=profiles&tab=contributions&user_id={gh_name}"
+    headers = {
+        "X-Requested-With": "XMLHttpRequest"
+    }
     async with httpx.AsyncClient() as client:
-        response = await client.get(url)
+        response = await client.get(url, headers=headers)
         response.raise_for_status()
         return response.text
 
@@ -22,21 +26,20 @@ async def check_contributions(gh_html: str) -> bool:
 
 
 async def get_today_contributions(gh_html: str) -> int:
-    match = re.compile(
-        r'data-date="' + get_today() + r".*?(\d+|No) contributions"
-    ).search(gh_html)
-    if match:
-        contributions = match.group(1)
-        if contributions == "No":
-            return 0
-        else:
-            return int(contributions)
-    else:
-        return 0
-
+    soup = BeautifulSoup(gh_html, "html.parser")
+    contributions = 0
+    if soup.tbody is None:
+        return contributions
+    tt = soup.tbody("tool-tip")
+    today_index = next((index for index, td in enumerate(soup.tbody("td", class_="ContributionCalendar-day")) if td.get('data-date') == get_today()), None)
+    if today_index is not None:
+        search = re.search(r'\d+', tt[today_index].text)
+        if search is not None:
+            contributions = int(search.group())
+    return contributions
 
 class AutoSave:
-    def __init__(self, fileProxy: Path, proxy: dict = None, initial_data: dict = None):
+    def __init__(self, fileProxy: Path, proxy: dict = None, initial_data: dict = None): # type: ignore
         self._fileProxy = fileProxy
         if proxy is None:
             if fileProxy.exists():
