@@ -11,6 +11,7 @@ dependencies = [
     "nonebot-plugin-apscheduler~=0.4",
     "nonebot-plugin-session~=0.3",
     "nonebot-plugin-localstore~=0.6",
+    "beautifulsoup4>=4.12.3",
 ]
 classifiers = [
     "Programming Language :: Python :: 3",
