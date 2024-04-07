@@ -73,7 +73,7 @@ def tile_msg(username: str, contributions: int):
         f"triggered tile_msg, username: {username}, contributions: {contributions}"
     )
     if contributions == 0:
-        return UniMessage(f"{username} 还没有贴瓷砖")
+        return UniMessage(f"{username} 今天还没有贴瓷砖")
     else:
         return UniMessage(f"{username} 在 {get_today()} 贴了 {contributions} 个瓷砖")
 
