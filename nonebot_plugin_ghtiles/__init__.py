@@ -201,6 +201,23 @@ async def tile_bind_cmd_handle(event: Event, username: str, session: EventSessio
     logger.debug(f"binded username: {username} to user_id: {user_id}")
     return await UniMessage(f"绑定成功，你的 GitHub 用户名是 {username}").send(event)
 
+tile_unbind_cmd = (
+    Command("tile.unbind", "解绑 GitHub 用户名")
+    .alias("解绑")
+    .usage("tile.unbind, 解绑 GitHub 用户名")
+    .build()
+)
+
+@tile_unbind_cmd.handle()
+async def tile_unbind_cmd_handle(event: Event, session: EventSession):
+    user_id = session.id1
+    if user_id not in _data["users"]:
+        return await UniMessage("你还没有绑定过 GitHub 用户名").send(event)
+    users_copy = _data["users"].copy()
+    del users_copy[user_id]
+    logger.debug(f"unbinded user_id: {user_id}")
+    return await UniMessage("解绑成功").send(event)
+
 
 tile_remine_cmd = (
     Command("tile.remind")
@@ -227,3 +244,26 @@ async def tile_remine_cmd_handle(event: Event, session: EventSession):
     _data["on_reminder"] = on_reminder_updated
     logger.debug(f"create reminder for user_id: {user_id} in group_id: {group_id}")
     return await UniMessage("创建提醒成功").send(event)
+
+
+tile_unremind_cmd = (
+    Command("tile.unremind")
+    .alias("取消提醒")
+    .usage("tile.unremind, 取消提醒")
+    .build()
+)
+
+@tile_unremind_cmd.handle()
+async def tile_unremind_cmd_handle(event: Event, session: EventSession):
+    user_id = session.id1
+    group_id = session.id2
+
+    on_reminder_updated = _data["on_reminder"].copy()
+
+    if group_id not in on_reminder_updated or not on_reminder_updated[group_id]:
+        return await UniMessage("你还没有过创建提醒").send(event)
+
+    on_reminder_updated[group_id].remove(user_id)
+    _data["on_reminder"] = on_reminder_updated
+    logger.debug(f"cancel reminder for user_id: {user_id} in group_id: {group_id}")
+    return await UniMessage("取消提醒成功").send(event)
