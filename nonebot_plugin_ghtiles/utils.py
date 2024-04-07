@@ -33,9 +33,11 @@ async def get_today_contributions(gh_html: str) -> int:
     tt = soup.tbody("tool-tip")
     today_index = next((index for index, td in enumerate(soup.tbody("td", class_="ContributionCalendar-day")) if td.get('data-date') == get_today()), None)
     if today_index is not None:
-        search = re.search(r'\d+', tt[today_index].text)
-        if search is not None:
-            contributions = int(search.group())
+        search = re.compile(r"(\d+|No) contribution").search(tt[today_index].text)
+        if search:
+            if search.group(1) == "No":
+                return contributions
+            contributions = int(search.group(1))
     return contributions
 
 class AutoSave:
