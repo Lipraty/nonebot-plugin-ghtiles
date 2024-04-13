@@ -97,7 +97,7 @@ conda install nonebot-plugin-ghtiles
 [tool.nonebot]
 plugins = [
     # ...
-    "nonebot_plugin_picstatus"
+    "nonebot_plugin_ghtiles"
 ]
 ```
 
@@ -124,7 +124,7 @@ GitHub 地址，如果需要解决国内访问 GitHub 的问题，可以替换�
 
 绑定你的 GitHub 用户名
 
-#### `tile.remine`
+#### `tile.remind`
 
 创建一个提醒，当这一天即将过去而你还没有提交时，会提醒你
 
