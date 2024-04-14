@@ -22,7 +22,8 @@ async def get_homepage_html(gh_name: str, proxy: str = "https://github.com") -> 
 
 
 async def check_contributions(gh_html: str) -> bool:
-    return re.compile(r"\'s activity is private\<\/h2\>").search(gh_html) is None
+    soup = BeautifulSoup(gh_html, "html.parser")
+    return bool(soup.tbody)
 
 
 async def get_today_contributions(gh_html: str) -> int:
